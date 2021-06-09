@@ -24,7 +24,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * @author Rob Winch
@@ -40,7 +40,8 @@ public class HelloSecurityApplicationTests {
 	void indexWhenUnAuthenticatedThenRedirect() throws Exception {
 		// @formatter:off
 		this.mockMvc.perform(get("/"))
-				.andExpect(status().isUnauthorized());
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/api/login"));
 		// @formatter:on
 	}
 
@@ -50,6 +51,15 @@ public class HelloSecurityApplicationTests {
 		// @formatter:off
 		this.mockMvc.perform(get("/"))
 				.andExpect(status().isOk());
+		// @formatter:on
+	}
+
+	@Test
+	void loginWhenUnAuthenticatedThenRedirect() throws Exception {
+		// @formatter:off
+		this.mockMvc.perform(get("/login"))
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("http://localhost/api/login"));
 		// @formatter:on
 	}
 

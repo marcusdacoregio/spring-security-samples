@@ -1,0 +1,8 @@
+server:
+  servlet:
+    context-path: /formlogin
+
+spring:
+  mvc:
+    servlet:
+      path: /api
