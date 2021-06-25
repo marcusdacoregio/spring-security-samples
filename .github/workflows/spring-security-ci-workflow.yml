@@ -1,0 +1,33 @@
+name: Spring Security CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      spring-security-version:
+        description: Spring Security Version to use as dependency
+        required: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    # eventually add in matrix here
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+      - name: Cache Gradle packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+      - name: Build with Gradle
+        env:
+          SPRING_SECURITY_VERSION: ${{ github.event.inputs.spring-security-version }}
+        run: |
+          echo "Running Samples"
+          echo "$SPRING_SECURITY_VERSION"
+          echo "$GITHUB_REF"
+          ./gradlew check -Pspring-security.version="$SPRING_SECURITY_VERSION" --continue
