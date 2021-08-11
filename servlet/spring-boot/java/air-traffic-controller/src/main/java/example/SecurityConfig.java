@@ -34,7 +34,8 @@ public class SecurityConfig {
 		// @formatter:off
 		http.authorizeRequests((authz) -> authz
 				.antMatchers(HttpMethod.PUT, "/requests/*").hasRole("PILOT")
-				.antMatchers(HttpMethod.POST, "/requests/*/approval").hasRole("CAPTAIN")
+				.antMatchers(HttpMethod.GET, "/requests/*").hasAnyRole("PILOT", "CONTROLLER")
+				.antMatchers(HttpMethod.POST, "/requests/*/approval").hasRole("CONTROLLER")
 				.anyRequest().authenticated());
 		http.httpBasic();
 		// @formatter:on
@@ -45,7 +46,8 @@ public class SecurityConfig {
 	public UserDetailsService userDetailsService() {
 		UserDetails josh = User.withUsername("josh")
 				.password("{bcrypt}$2a$10$K0tArQLT0iWglT5PMrxyt.2iYYiwnrW05p93cXlsyXJuwZqyJXIm.")
-				.roles("CAPTAIN")
+//				.password("{noop}control")
+				.roles("CONTROLLER")
 				.build();
 		UserDetails marcus = User.withUsername("marcus")
 				.password("{noop}password")

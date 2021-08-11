@@ -21,13 +21,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class RequestsService {
 
-	private static final Map<String, TakeOffRequest> REQUESTS = new HashMap<>();
+	private static final Map<String, TakeOffRequest> REQUESTS = new ConcurrentHashMap<>();
 
 	public List<TakeOffRequest> getRequests() {
 		return new ArrayList<>(REQUESTS.values());
@@ -52,4 +53,7 @@ public class RequestsService {
 		}
 	}
 
+	public TakeOffRequest getRequest(String flightNumber) {
+		return REQUESTS.get(flightNumber);
+	}
 }

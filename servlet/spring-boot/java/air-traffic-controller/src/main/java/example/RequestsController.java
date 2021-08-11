@@ -18,12 +18,14 @@ package example;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -41,9 +43,14 @@ public class RequestsController {
 		return this.requestsService.getRequests();
 	}
 
+	@GetMapping("/{flightNumber}")
+	public TakeOffRequest getRequest(@PathVariable String flightNumber) {
+		return this.requestsService.getRequest(flightNumber);
+	}
+
 	@PutMapping("/{flightNumber}")
-	public void createRequest(@PathVariable String flightNumber) {
-		this.requestsService.createRequest("pilot?", flightNumber);
+	public void createRequest(@PathVariable String flightNumber, @RequestParam String pilotId) {
+		this.requestsService.createRequest(pilotId, flightNumber);
 	}
 
 	@PostMapping("/{flightNumber}/approval")
