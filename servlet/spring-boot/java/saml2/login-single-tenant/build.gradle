@@ -33,3 +33,15 @@ tasks.withType(Test).configureEach {
 	useJUnitPlatform()
 	outputs.upToDateWhen { false }
 }
+
+test {
+	onlyIf {
+		!project.hasProperty('excludeJava11Tests')
+	}
+}
+
+integrationTest {
+	onlyIf {
+		!project.hasProperty('excludeJava11Tests')
+	}
+}
