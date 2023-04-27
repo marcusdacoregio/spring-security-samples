@@ -16,10 +16,14 @@
 
 package example;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.ElementNotFoundException;
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
@@ -33,7 +37,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.web.htmlunit.LocalHostWebClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
+import org.springframework.util.Assert;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -106,6 +116,36 @@ public class Saml2LoginApplicationITests {
 			}
 		}
 		throw new IllegalStateException("Could not resolve login form");
+	}
+
+	@TestConfiguration
+	static class WebClientConfiguration {
+
+		@Bean
+		public MockMvcWebClientBuilder mockMvcWebClientBuilder(MockMvc mockMvc, Environment environment) {
+			return MockMvcWebClientBuilder.mockMvcSetup(mockMvc).withDelegate(new InternetExplorerLocalHostWebClient(environment));
+		}
+
+	}
+
+	static class InternetExplorerLocalHostWebClient extends WebClient {
+
+		private final Environment environment;
+
+		public InternetExplorerLocalHostWebClient(Environment environment) {
+			super(BrowserVersion.INTERNET_EXPLORER);
+			Assert.notNull(environment, "Environment must not be null");
+			this.environment = environment;
+		}
+
+		@Override
+		public <P extends Page> P getPage(String url) throws IOException, FailingHttpStatusCodeException {
+			if (url.startsWith("/")) {
+				String port = this.environment.getProperty("local.server.port", "8080");
+				url = "http://localhost:" + port + url;
+			}
+			return super.getPage(url);
+		}
 	}
 
 }
